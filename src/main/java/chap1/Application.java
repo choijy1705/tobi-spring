@@ -1,13 +1,13 @@
 package chap1;
 
-import chap1.dao.UserDao;
+import chap1.dao.NUserDao;
 import chap1.domain.User;
 
 import java.sql.SQLException;
 
 public class Application {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        UserDao dao = new UserDao();
+        NUserDao dao = new NUserDao();
 
         User user = new User();
         user.setId("white");
