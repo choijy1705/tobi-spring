@@ -1,14 +1,16 @@
 package chap1;
 
-import chap1.dao.NUserDao;
+import chap1.connection.ConnectionMaker;
+import chap1.connection.DConnectionMaker;
 import chap1.dao.UserDao;
 import chap1.domain.User;
 
 import java.sql.SQLException;
 
-public class Application {
+public class UserDaoTest {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        UserDao dao = new UserDao();
+        ConnectionMaker connectionMaker = new DConnectionMaker();
+        UserDao dao = new UserDao(connectionMaker);
 
         User user = new User();
         user.setId("white");
