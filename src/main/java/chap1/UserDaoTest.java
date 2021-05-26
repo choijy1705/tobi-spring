@@ -5,16 +5,18 @@ import chap1.dao.UserDao;
 import chap1.domain.User;
 import org.apache.catalina.core.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 
 import java.sql.SQLException;
 
 public class UserDaoTest {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         UserDao dao = context.getBean("userDao", UserDao.class);
 
         User user = new User();
-        user.setId("white");
+        user.setId("black");
         user.setName("백기선");
         user.setPassword("married");
 
