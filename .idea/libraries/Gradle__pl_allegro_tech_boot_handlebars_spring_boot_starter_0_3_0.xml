@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: pl.allegro.tech.boot:handlebars-spring-boot-starter:0.3.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/pl.allegro.tech.boot/handlebars-spring-boot-starter/0.3.0/d36b6a06f1f3adda6ca864bc43d2a695bf0ae618/handlebars-spring-boot-starter-0.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/pl.allegro.tech.boot/handlebars-spring-boot-starter/0.3.0/1179c1e396e126f131d2e7d67629a9cde77b2f8d/handlebars-spring-boot-starter-0.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

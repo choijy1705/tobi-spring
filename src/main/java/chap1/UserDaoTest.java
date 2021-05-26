@@ -3,13 +3,15 @@ package chap1;
 import chap1.dao.DaoFactory;
 import chap1.dao.UserDao;
 import chap1.domain.User;
+import org.apache.catalina.core.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
 
 public class UserDaoTest {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-
-        UserDao dao = new DaoFactory().userDao();
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao dao = context.getBean("userDao", UserDao.class);
 
         User user = new User();
         user.setId("white");
