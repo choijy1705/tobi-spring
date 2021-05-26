@@ -1,6 +1,7 @@
 package chap1.dao;
 
 import chap1.connection.ConnectionMaker;
+import chap1.connection.CountingConnectionMaker;
 import chap1.connection.DConnectionMaker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +15,20 @@ public class DaoFactory {
     }
 
     public AccountDao accountDao() {
-        return new AccountDao(connectionMaker());
+        return new AccountDao(realConnectionMaker());
     }
 
     public MessageDao messageDao() {
-        return new MessageDao(connectionMaker());
+        return new MessageDao(realConnectionMaker());
     }
 
     @Bean
     public ConnectionMaker connectionMaker() {
+        return new CountingConnectionMaker(realConnectionMaker());
+    }
+
+    @Bean
+    public ConnectionMaker realConnectionMaker() {
         ConnectionMaker connectionMaker = new DConnectionMaker();
         return connectionMaker;
     }
