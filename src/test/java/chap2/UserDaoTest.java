@@ -2,6 +2,7 @@ package chap2;
 
 import chap2.dao.UserDao;
 import chap2.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -10,15 +11,19 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 
 class UserDaoTest {
+
+    private UserDao dao;
+
+    @BeforeEach
+    void setUp() {
+        GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
+        dao = context.getBean("userDao2", UserDao.class);
+    }
+
     @Test
     public void addAndGet() throws SQLException, ClassNotFoundException {
-        //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-        GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao2", UserDao.class);
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
@@ -39,9 +44,6 @@ class UserDaoTest {
 
     @Test
     public void count() throws SQLException, ClassNotFoundException {
-        GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao2", UserDao.class);
-
         User user1 = new User("1", "abc", "spring1");
         User user2 = new User("2", "zxc", "spring1");
         User user3 = new User("3", "qwe", "spring1");
@@ -69,7 +71,7 @@ class UserDaoTest {
 
         assertThatThrownBy(() -> {
             dao.get("1");
-        }).isInstanceOf(SQLException.class);
+        }).isInstanceOf(EmptyResultDataAccessException.class);
     }
 
 }
