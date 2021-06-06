@@ -4,23 +4,29 @@ import chap2.dao.UserDao;
 import chap2.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = "/test-applicationContext.xml")
 class UserDaoTest {
 
+    @Autowired
     private UserDao dao;
-
-    @BeforeEach
-    void setUp() {
-        GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        dao = context.getBean("userDao2", UserDao.class);
-    }
 
     @Test
     public void addAndGet() throws SQLException, ClassNotFoundException {
@@ -63,8 +69,6 @@ class UserDaoTest {
 
     @Test
     public void getUserFailure() throws SQLException {
-        GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao2", UserDao.class);
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
