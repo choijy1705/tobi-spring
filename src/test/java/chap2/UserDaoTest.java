@@ -29,7 +29,7 @@ class UserDaoTest {
     private UserDao dao;
 
     @Test
-    public void addAndGet() throws SQLException, ClassNotFoundException {
+    public void addAndGet() throws Exception {
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
@@ -49,7 +49,7 @@ class UserDaoTest {
     }
 
     @Test
-    public void count() throws SQLException, ClassNotFoundException {
+    public void count() throws Exception {
         User user1 = new User("1", "abc", "spring1");
         User user2 = new User("2", "zxc", "spring1");
         User user3 = new User("3", "qwe", "spring1");
@@ -68,7 +68,7 @@ class UserDaoTest {
     }
 
     @Test
-    public void getUserFailure() throws SQLException {
+    public void getUserFailure() throws Exception {
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
