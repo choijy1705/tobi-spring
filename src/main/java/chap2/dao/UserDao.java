@@ -1,5 +1,6 @@
 package chap2.dao;
 
+import chap2.context.JdbcContext;
 import chap2.domain.User;
 import chap2.strategy.DeleteAllStatement;
 import chap2.strategy.StatementStrategy;
@@ -13,15 +14,20 @@ import java.sql.SQLException;
 
 public class UserDao {
 
+    private JdbcContext jdbcContext;
     private DataSource dataSource;
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    public void setJdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
+    }
+
     public void add(User user) throws Exception {
 
-        jdbcContextWithStatementStrategy(c -> {
+        jdbcContext.workWithStatementStrategy(c -> {
             PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
             ps.setString(1, user.getId());
             ps.setString(2, user.getName());
@@ -63,7 +69,7 @@ public class UserDao {
     }
 
     public void deleteAll() throws Exception {
-        jdbcContextWithStatementStrategy(c -> c.prepareStatement("delete from users"));
+        this.jdbcContext.workWithStatementStrategy(c -> c.prepareStatement("delete from users"));
     }
 
     public int getCount() throws SQLException {
