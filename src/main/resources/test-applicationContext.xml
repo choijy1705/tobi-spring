@@ -14,9 +14,6 @@
     </bean>
     <bean id="userDao2" class="chap2.dao.UserDao">
         <property name="dataSource" ref="dataSource" />
-        <property name="jdbcContext" ref="jdbcContext" />
     </bean>
-    <bean id="jdbcContext" class="chap2.context.JdbcContext">
-        <property name="dataSource" ref="dataSource" />
-    </bean>
+
 </beans>
