@@ -1,11 +1,8 @@
 package chap2;
 
-import chap2.dao.UserDao;
+import chap2.dao.UserDaoJdbc;
 import chap2.domain.User;
-import org.apache.commons.lang3.builder.ToStringExclude;
 import org.springframework.context.support.GenericXmlApplicationContext;
-
-import java.sql.SQLException;
 
 public class UserDaoTest {
 
@@ -13,7 +10,7 @@ public class UserDaoTest {
 
         //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         GenericXmlApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-        UserDao dao = context.getBean("userDao2", UserDao.class);
+        UserDaoJdbc dao = context.getBean("userDao2", UserDaoJdbc.class);
 
         User user = new User();
         user.setId("chap2");

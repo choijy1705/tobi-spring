@@ -1,22 +1,17 @@
 package chap2;
 
 import chap2.dao.UserDao;
+import chap2.dao.UserDaoJdbc;
 import chap2.domain.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/test-applicationContext.xml")
-class UserDaoTest {
+class UserDaoJdbcTest {
 
     @Autowired
     private UserDao dao;
@@ -114,5 +109,16 @@ class UserDaoTest {
         assertThat(user1.getId()).isEqualTo(user2.getId());
         assertThat(user1.getName()).isEqualTo(user2.getName());
         assertThat(user1.getPassword()).isEqualTo(user2.getPassword());
+    }
+
+    @Test
+    public void duplicateKey() {
+        dao.deleteAll();
+
+        User user1 = new User("1", "abc", "spring1");
+        assertThatThrownBy(() -> {
+            dao.add(user1);
+            dao.add(user1);
+        }).isInstanceOf(DuplicateKeyException.class);
     }
 }
