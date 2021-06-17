@@ -2,7 +2,9 @@ package chap2;
 
 import chap2.dao.UserDao;
 import chap2.dao.UserDaoJdbc;
+import chap2.domain.Level;
 import chap2.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,31 +26,37 @@ class UserDaoJdbcTest {
     @Autowired
     private UserDao dao;
 
+    private User user1;
+    private User user2;
+    private User user3;
+
+    @BeforeEach
+    public void setUp() {
+        this.user1 = new User("gyumee", "박성철", "springno1", Level.BASIC, 1, 0);
+        this.user2 = new User("leegw700", "이길원" , "springno2", Level.SILVER, 55, 10);
+        this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40);
+
+    }
+
     @Test
     public void addAndGet() throws Exception {
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
 
-        User user = new User();
-        user.setId("1234");
-        user.setName("abc");
-        user.setPassword("married");
 
-        dao.add(user);
-        assertThat(dao.getCount()).isEqualTo(1);
+        dao.add(user1);
+        dao.add(user2);
 
-        User user2 = dao.get(user.getId());
+        User userget1 = dao.get(user1.getId());
+        checkSameUser(user1, userget1);
 
-        assertThat(user2.getName()).isEqualTo(user.getName());
-        assertThat(user2.getPassword()).isEqualTo(user.getPassword());
+        User userget2 = dao.get(user2.getId());
+        checkSameUser(user2, userget2);
     }
 
     @Test
     public void count() throws Exception {
-        User user1 = new User("1", "abc", "spring1");
-        User user2 = new User("2", "zxc", "spring1");
-        User user3 = new User("3", "qwe", "spring1");
 
         dao.deleteAll();
         assertThat(dao.getCount()).isEqualTo(0);
@@ -78,10 +86,6 @@ class UserDaoJdbcTest {
     public void getAll() throws Exception {
         dao.deleteAll();
 
-        User user1 = new User("1", "abc", "spring1");
-        User user2 = new User("2", "zxc", "spring1");
-        User user3 = new User("3", "qwe", "spring1");
-
         List<User> users0 = dao.getAll();
         assertThat(users0.size()).isEqualTo(0);
 
@@ -109,13 +113,15 @@ class UserDaoJdbcTest {
         assertThat(user1.getId()).isEqualTo(user2.getId());
         assertThat(user1.getName()).isEqualTo(user2.getName());
         assertThat(user1.getPassword()).isEqualTo(user2.getPassword());
+        assertThat(user1.getLevel()).isEqualTo(user2.getLevel());
+        assertThat(user1.getLogin()).isEqualTo(user2.getLogin());
+        assertThat(user1.getRecommend()).isEqualTo(user2.getRecommend());
     }
 
     @Test
     public void duplicateKey() {
         dao.deleteAll();
 
-        User user1 = new User("1", "abc", "spring1");
         assertThatThrownBy(() -> {
             dao.add(user1);
             dao.add(user1);
