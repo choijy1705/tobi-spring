@@ -1,14 +1,12 @@
 package chap2;
 
 import chap2.dao.UserDao;
-import chap2.dao.UserDaoJdbc;
 import chap2.domain.Level;
 import chap2.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,9 +30,10 @@ class UserDaoJdbcTest {
 
     @BeforeEach
     public void setUp() {
-        this.user1 = new User("1", "park", "springno1", Level.BASIC, 1, 0);
-        this.user2 = new User("2", "lee" , "springno2", Level.SILVER, 55, 10);
-        this.user3 = new User("3", "bum", "springno3", Level.GOLD, 100, 40);
+        String email = "abc@abc.com";
+        this.user1 = new User("1", "park", "springno1", Level.BASIC, 1, 0, email);
+        this.user2 = new User("2", "lee" , "springno2", Level.SILVER, 55, 10, email);
+        this.user3 = new User("3", "bum", "springno3", Level.GOLD, 100, 40, email);
 
     }
 

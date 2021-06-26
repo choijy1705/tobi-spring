@@ -28,9 +28,9 @@ public class UserDaoJdbc implements UserDao{
     }
 
     public void add(User user) throws DuplicateUserIdException {
-        String sql = "INSERT INTO users(id, name, password, level, login, recommend) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO users(id, name, password, level, login, recommend, email) VALUES(?,?,?,?,?,?,?)";
         this.jdbcTemplate.update(sql,
-                user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend());
+                user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend(), user.getEmail());
 
     }
 

@@ -4,17 +4,17 @@ import chap2.dao.UserDao;
 import chap2.dao.UserDaoJdbc;
 import chap2.domain.Level;
 import chap2.domain.User;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DataSourceUtils;
+
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+
 
 public class UserService {
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
@@ -22,6 +22,11 @@ public class UserService {
 
     private UserDao userDao;
     private PlatformTransactionManager transactionManager;
+    private MailSender mailSender;
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void setUserDao(UserDaoJdbc userDao) {
         this.userDao = userDao;
@@ -51,6 +56,18 @@ public class UserService {
     protected void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
+        sendUpgradeEmail(user);
+    }
+
+    private void sendUpgradeEmail(User user) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("useradmin@ksug.org");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+        System.out.println(mailMessage.getFrom());
+        this.mailSender.send(mailMessage);
+
     }
 
 

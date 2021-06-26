@@ -19,7 +19,11 @@
     <bean id="userService" class="chap2.service.UserService">
         <property name="userDao" ref="userDao2"></property>
         <property name="transactionManager" ref="transactionManager"/>
+        <property name="mailSender" ref="mailSender"/>
     </bean>
+
+    <bean id="mailSender" class="chap2.service.DummyMailSender"/>
+
 
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

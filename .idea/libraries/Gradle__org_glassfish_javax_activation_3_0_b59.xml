@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.glassfish:javax.activation:3.0-b59">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.glassfish/javax.activation/3.0-b59/365224c127c4bf96d8d18292a2266cd5a6b89c3c/javax.activation-3.0-b59.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.glassfish/javax.activation/3.0-b59/3807c896f52995ff366f5356e3336ca8f7308d49/javax.activation-3.0-b59-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

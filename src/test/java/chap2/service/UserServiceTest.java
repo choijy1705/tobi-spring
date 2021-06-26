@@ -7,12 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +36,9 @@ class UserServiceTest {
 
     @Autowired
     PlatformTransactionManager transactionManager;
+
+    @Autowired
+    MailSender mailSender;
 
     List<User> users;
 
@@ -60,21 +64,26 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        String email = "abc@abc.com";
         users = Arrays.asList(
-                new User("1", "bumjin", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0),
-                new User("2", "joytouch", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-                new User("3", "erwins", "p3", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1),
-                new User("4", "madnite1", "p4", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD),
-                new User("5", "green", "p5", Level.GOLD, 100, Integer.MAX_VALUE)
+                new User("1", "bumjin", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER-1, 0, email),
+                new User("2", "joytouch", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0, email),
+                new User("3", "erwins", "p3", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD-1, email),
+                new User("4", "madnite1", "p4", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD, email),
+                new User("5", "green", "p5", Level.GOLD, 100, Integer.MAX_VALUE, email)
         );
     }
 
     @Test
+    @DirtiesContext
     public void upgradeLevels() throws SQLException {
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
+
+        MockMailSender mockMailSender = new MockMailSender();
+        userService.setMailSender(mockMailSender);
 
         userService.upgradeLevels();
 
@@ -83,6 +92,11 @@ class UserServiceTest {
         checkLevel(users.get(2), false);
         checkLevel(users.get(3), true);
         checkLevel(users.get(4), false);
+
+        List<String> request = mockMailSender.getRequests();
+        assertThat(request.size()).isEqualTo(2);
+        assertThat(request.get(0)).isEqualTo(users.get(1).getEmail());
+        assertThat(request.get(1)).isEqualTo(users.get(3).getEmail());
     }
 
     private void checkLevel(User user, boolean upgraded) {
@@ -117,6 +131,7 @@ class UserServiceTest {
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setTransactionManager(this.transactionManager);
+        testUserService.setMailSender(mailSender);
         userDao.deleteAll();
 
         for (User user : users) {
