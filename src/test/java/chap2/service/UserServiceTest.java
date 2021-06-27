@@ -18,8 +18,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import static chap2.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static chap2.service.UserService.MIN_RECCOMEND_FOR_GOLD;
+import static chap2.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static chap2.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.fail;
 class UserServiceTest {
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userServiceImpl;
 
     @Autowired
     UserDaoJdbc userDao;
@@ -42,7 +42,7 @@ class UserServiceTest {
 
     List<User> users;
 
-    static class TestUserService extends UserService {
+    static class TestUserService extends UserServiceImpl {
         private final String id;
 
         private TestUserService(String id) {
@@ -83,9 +83,9 @@ class UserServiceTest {
         }
 
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
-        userService.upgradeLevels();
+        userServiceImpl.upgradeLevels();
 
         checkLevel(users.get(0), false);
         checkLevel(users.get(1), true);
@@ -116,8 +116,8 @@ class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        userService.add(userWithLevel);
-        userService.add(userWithoutLevel);
+        userServiceImpl.add(userWithLevel);
+        userServiceImpl.add(userWithoutLevel);
 
         User userWithLevelRead = userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -128,10 +128,14 @@ class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() {
-        UserService testUserService = new TestUserService(users.get(3).getId());
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
-        testUserService.setTransactionManager(this.transactionManager);
         testUserService.setMailSender(mailSender);
+
+        UserServiceTx txUserService = new UserServiceTx();
+        txUserService.setTransactionManager(transactionManager);
+        txUserService.setUserService(testUserService);
+
         userDao.deleteAll();
 
         for (User user : users) {
@@ -139,7 +143,7 @@ class UserServiceTest {
         }
 
         try {
-            testUserService.upgradeLevels();
+            txUserService.upgradeLevels();
             fail("TestUserServiceException expected");
         } catch (TestUserServiceException | SQLException e) {
             System.out.println("실패 성공");

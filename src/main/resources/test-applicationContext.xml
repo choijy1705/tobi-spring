@@ -16,9 +16,13 @@
         <property name="dataSource" ref="dataSource" />
     </bean>
 
-    <bean id="userService" class="chap2.service.UserService">
-        <property name="userDao" ref="userDao2"></property>
+    <bean id="userService" class="chap2.service.UserServiceTx">
         <property name="transactionManager" ref="transactionManager"/>
+        <property name="userService" ref="userServiceImpl"/>
+    </bean>
+
+    <bean id="userServiceImpl" class="chap2.service.UserServiceImpl">
+        <property name="userDao" ref="userDao2"/>
         <property name="mailSender" ref="mailSender"/>
     </bean>
 
