@@ -32,11 +32,7 @@ public class UserServiceImpl implements UserService{
         this.userDao = userDao;
     }
 
-    public void setTransactionManager(PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-    }
-
-    public void upgradeLevels() throws SQLException {
+    public void upgradeLevels() {
         List<User> users = userDao.getAll();
         for (User user : users) {
             if (canUpgradeLevel(user)) {

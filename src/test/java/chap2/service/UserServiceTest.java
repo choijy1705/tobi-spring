@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +18,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
-
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -71,51 +71,6 @@ class UserServiceTest {
 
     }
 
-    static class MockUserDao implements UserDao {
-        private List<User> users;
-        private List<User> updated = new ArrayList<>();
-
-        private MockUserDao(List<User> users) {
-            this.users = users;
-        }
-
-        public List<User> getUpdated() {
-            return this.updated;
-        }
-
-
-
-        @Override
-        public List<User> getAll() {
-            return this.users;
-        }
-
-        @Override
-        public void update(User user) {
-            updated.add(user);
-        }
-
-        @Override
-        public void add(User user) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public User get(String id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void deleteAll() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getCount() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
     @BeforeEach
     void setUp() {
         String email = "abc@abc.com";
@@ -156,14 +111,9 @@ class UserServiceTest {
         assertThat(mailMessages.get(1).getTo()[0]).isEqualTo(users.get(3).getEmail());
     }
 
-    private void checkUserAndLevel(User updated, String expected, Level expectedLevel) {
-        assertThat(updated.getId()).isEqualTo(expected);
-        assertThat(updated.getLevel()).isEqualTo(expectedLevel);
-    }
 
     private void checkLevel(User user, boolean upgraded) {
         User userUpdate = userDao.get(user.getId());
-        System.out.println("-------------------------" + user.getId());
         if (upgraded) {
             assertThat(userUpdate.getLevel()).isEqualTo(user.getLevel().nextLevel());
         } else {
@@ -192,7 +142,6 @@ class UserServiceTest {
     @Test
     public void upgradeAllOrNothing() throws Exception {
         userDao.deleteAll();
-
         for (User user : users) {
             userDao.add(user);
         }
@@ -204,7 +153,12 @@ class UserServiceTest {
             System.out.println("실패 성공");
         }
 
-        checkLevel(users.get(1), true);
+        checkLevel(users.get(1), false);
+    }
+
+    @Test
+    public void advisorAutoProxyCreator() {
+        assertThat(testUserService).isInstanceOf(java.lang.reflect.Proxy.class);
     }
 
 }
