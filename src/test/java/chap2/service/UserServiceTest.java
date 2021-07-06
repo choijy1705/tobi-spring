@@ -12,12 +12,15 @@ import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,8 +29,7 @@ import java.util.List;
 
 import static chap2.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static chap2.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -64,6 +66,14 @@ class UserServiceTest {
                 throw new TestUserServiceException();
             }
             super.upgradeLevel(user);
+        }
+
+        @Override
+        public List<User> getAll() {
+            for(User user : super.getAll()) {
+                super.update(user);
+            }
+            return null;
         }
     }
 
@@ -161,4 +171,31 @@ class UserServiceTest {
         assertThat(testUserService).isInstanceOf(java.lang.reflect.Proxy.class);
     }
 
+    @Test
+    public void readOnlyTransactionAttribute() {
+        assertThatThrownBy(() -> {
+            testUserService.getAll();
+        }).isInstanceOf(TransientDataAccessResourceException.class);
+
+    }
+
+    @Test
+    public void transactionSync() {
+        userDao.deleteAll();
+        assertThat(userDao.getCount()).isEqualTo(0);
+
+        DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();
+        TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
+
+        userService.deleteAll();
+
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+
+        assertThat(userDao.getCount()).isEqualTo(2);
+
+        transactionManager.rollback(txStatus);
+
+        assertThat(userDao.getCount()).isEqualTo(0);
+    }
 }
